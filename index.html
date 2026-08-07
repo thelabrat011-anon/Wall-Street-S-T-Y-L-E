@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wall Street CFD — Trading Terminal Pro</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Toast Notifications -->
+    <div id="toastWrap"></div>
+
+    <!-- Top Navigation Bar -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <div class="logo-wrap" id="logoWrap">
+                <div class="logo-bull">🐂</div>
+                <div>
+                    <div class="logo-text">WALL<span>ST</span></div>
+                    <div class="logo-sub">S·T·Y·L·E</div>
+                </div>
+            </div>
+        </div>
+        <nav class="topbar-center" id="mainNav">
+            <button class="active" data-cat="todos"><span>📊 Dashboard</span></button>
+            <button data-cat="accion"><span>📈 Stocks</span></button>
+            <button data-cat="indice"><span>📉 Indices</span></button>
+            <button data-cat="cripto"><span>₿ Crypto</span></button>
+        </nav>
+        <div class="topbar-right">
+            <button class="btn-icon" id="optBtn"><span>📊 Opciones</span></button>
+            <button class="btn-icon" id="themeBtn"><span>☀</span></button>
+            <button class="btn-icon" id="fullscreenBtn"><span>⛶</span></button>
+            <button class="btn-primary" id="tradeBtn"><span>💰 Trade</span></button>
+        </div>
+    </header>
+
+    <!-- Market Ticker -->
+    <div class="ticker-wrap">
+        <div class="ticker-inner" id="ticker"></div>
+    </div>
+
+    <!-- Main Application -->
+    <div class="app-container">
+
+        <!-- Stats Grid -->
+        <div class="stats-grid" id="statsGrid"></div>
+
+        <!-- Controls -->
+        <div class="controls-row">
+            <div class="controls-left">
+                <span class="market-status" id="marketStatus">🔴 Mercado cerrado</span>
+                <span class="live-indicator" id="liveIndicator">● EN VIVO</span>
+            </div>
+            <div class="controls-right">
+                <div class="search-wrap">
+                    <input id="searchBox" placeholder="🔍 Buscar símbolo…">
+                </div>
+                <select id="sortSel">
+                    <option value="default">📋 Ordenar</option>
+                    <option value="change-desc">🚀 Mayor % ▲</option>
+                    <option value="change-asc">📉 Menor % ▼</option>
+                    <option value="alpha">🔤 Alfabético</option>
+                    <option value="price-desc">💰 Mayor precio</option>
+                    <option value="price-asc">💰 Menor precio</option>
+                </select>
+                <button class="btn-icon" id="refreshBtn" title="Actualizar datos">🔄</button>
+            </div>
+        </div>
+
+        <!-- Add Asset Form -->
+        <form class="add-form" id="addForm">
+            <div class="add-type-wrap">
+                <select id="addType">
+                    <option value="accion">📈 Acción</option>
+                    <option value="indice">📉 Índice</option>
+                    <option value="cripto">₿ Cripto</option>
+                </select>
+            </div>
+            <div class="ac-wrap">
+                <input id="addSymbol" placeholder="🔍 Buscar por nombre o ticker…" autocomplete="off">
+                <div class="ac-list" id="acList"></div>
+            </div>
+            <button type="submit" class="btn-add">+ Agregar</button>
+        </form>
+
+        <!-- Grid / Watchlist -->
+        <div class="grid-wrap">
+            <div class="grid" id="grid"></div>
+            <div class="empty" id="emptyMsg" style="display:none;">
+                <div class="empty-icon">📭</div>
+                <div class="empty-text">No hay resultados para mostrar</div>
+                <div class="empty-sub">Agrega activos desde el buscador arriba</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-left">
+            <span id="lastUpdated">🔄 Cargando datos…</span>
+            <span class="dot">•</span>
+            <span id="assetCount">0 activos</span>
+            <span class="dot">•</span>
+            <span id="marketStatusFooter">Mercado: Cerrado</span>
+        </div>
+        <div class="footer-right">
+            <label class="toggle-label">
+                <input type="checkbox" id="autoRefresh" checked>
+                <span class="toggle-slider"></span>
+                <span>Auto actualizar</span>
+            </label>
+            <span class="divider">|</span>
+            <span class="disclaimer">⏱ Datos en tiempo real</span>
+            <span class="divider">|</span>
+            <span class="version">v3.0 Pro</span>
+        </div>
+    </footer>
+
+    <!-- Trade Modal -->
+    <dialog id="tradeDialog">
+        <div class="modal-inner">
+            <button class="modal-close" id="tradeClose">✕</button>
+            <div class="modal-header">
+                <div class="modal-title">
+                    <span class="gold">💰</span> Trade 
+                    <span id="tradeSymbolDisplay">AAPL</span>
+                </div>
+                <div class="modal-sub" id="tradePriceDisplay">Precio actual: $0.00</div>
+            </div>
+
+            <div class="modal-body">
+                <div class="modal-row">
+                    <div class="input-group">
+                        <label>Orden</label>
+                        <select id="tradeOrderType">
+                            <option value="market">Market</option>
+                            <option value="limit">Limit</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Lado</label>
+                        <select id="tradeSide">
+                            <option value="buy">Comprar</option>
+                            <option value="sell">Vender</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-row">
+                    <div class="input-group">
+                        <label>Cantidad</label>
+                        <input type="number" id="tradeQty" value="1" min="1" step="1">
+                    </div>
+                    <div class="input-group">
+                        <label>Precio límite</label>
+                        <div class="input-with-icon">
+                            <span class="input-icon">$</span>
+                            <input type="number" id="tradeLimitPrice" step="0.01" placeholder="0.00" disabled>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-summary">
+                    <div class="summary-item">
+                        <span class="summary-label">Total estimado</span>
+                        <span class="summary-value" id="tradeTotal">$0.00</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Comisión</span>
+                        <span class="summary-value" style="font-size:13px;color:var(--text-muted);">$0.00</span>
+                    </div>
+                </div>
+
+                <div class="payment-methods">
+                    <button type="button" class="pm active" data-pm="card">💳 Tarjeta</button>
+                    <button type="button" class="pm" data-pm="paypal">PayPal</button>
+                    <button type="button" class="pm" data-pm="revolut">Revolut</button>
+                    <button type="button" class="pm" data-pm="wise">Wise</button>
+                    <button type="button" class="pm" data-pm="bank">🏦 Transferencia</button>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-buy" id="tradeExecuteBuy">🟢 Comprar</button>
+                <button class="btn-sell" id="tradeExecuteSell">🔴 Vender</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Options Chain Modal -->
+    <dialog id="optDialog">
+        <div class="modal-inner">
+            <button class="modal-close" id="optClose">✕</button>
+            <div class="modal-header">
+                <div class="modal-title">
+                    <span class="gold">📊</span> Cadena de Opciones
+                </div>
+            </div>
+            <div class="opt-controls">
+                <div class="ac-wrap">
+                    <input id="optSymbolInput" placeholder="🔍 Ticker, ej: AAPL" autocomplete="off">
+                    <div class="ac-list" id="optAcList"></div>
+                </div>
+                <select id="optExpiry" disabled>
+                    <option>📅 Vencimiento…</option>
+                </select>
+                <div class="opt-type-toggle" id="optTypeToggle">
+                    <button type="button" class="active" data-side="both">Ambos</button>
+                    <button type="button" data-side="calls">Calls</button>
+                    <button type="button" data-side="puts">Puts</button>
+                </div>
+            </div>
+            <div class="opt-meta" id="optMeta"></div>
+            <div class="opt-table-wrap">
+                <table class="opt-table" id="optTable" style="display:none;">
+                    <thead><tr id="optHeadRow"></tr></thead>
+                    <tbody id="optBody"></tbody>
+                </table>
+                <div class="opt-empty" id="optEmpty">
+                    <div class="empty-icon">📊</div>
+                    <div>Buscá un subyacente para ver su cadena de opciones</div>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Chart Modal -->
+    <dialog id="chartDialog">
+        <div class="modal-inner" style="max-width:900px;">
+            <button class="modal-close" id="chartClose">✕</button>
+            <div class="modal-header">
+                <div class="modal-title">
+                    <span id="chartSymbol">📈 AAPL</span>
+                    <span class="modal-sub" id="chartPrice">$0.00</span>
+                </div>
+                <div class="modal-sub" id="chartChange" style="font-family:'JetBrains Mono',monospace;"></div>
+            </div>
+            <div class="chart-container">
+                <canvas id="chartCanvas"></canvas>
+            </div>
+            <div class="chart-controls">
+                <button class="chart-time active" data-time="1D">1D</button>
+                <button class="chart-time" data-time="5D">5D</button>
+                <button class="chart-time" data-time="1M">1M</button>
+                <button class="chart-time" data-time="3M">3M</button>
+                <button class="chart-time" data-time="6M">6M</button>
+                <button class="chart-time" data-time="1Y">1Y</button>
+                <button class="chart-time" data-time="ALL">Todo</button>
+            </div>
+            <div class="chart-info">
+                <span id="chartHigh">Máx: --</span>
+                <span id="chartLow">Mín: --</span>
+                <span id="chartVolume">Vol: --</span>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- JavaScript -->
+    <script src="js/app.js"></script>
+</body>
+</html>
